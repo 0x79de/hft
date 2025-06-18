@@ -1,0 +1,31 @@
+[package]
+name = "benchmarks"
+version = "0.1.0"
+edition = "2021"
+authors = ["HFT Trading Team"]
+description = "Comprehensive benchmarking suite for HFT trading system"
+
+[[bin]]
+name = "bench_order_book"
+path = "src/order_book_bench.rs"
+
+[[bin]]
+name = "bench_latency"
+path = "src/latency_bench.rs"
+
+[[bin]]
+name = "bench_throughput"
+path = "src/throughput_bench.rs"
+
+[dependencies]
+serde = { workspace = true }
+tokio = { workspace = true }
+crossbeam = { workspace = true }
+criterion = { version = "0.5", features = ["html_reports"] }
+rand = "0.8"
+order-book = { path = "../order-book" }
+event-processor = { path = "../event-processor" }
+trading-engine = { path = "../trading-engine" }
+latency-profiler = { path = "../latency-profiler" }
+tracing = { workspace = true }
+anyhow = { workspace = true }

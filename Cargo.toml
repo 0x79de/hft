@@ -1,0 +1,123 @@
+[package]
+name = "hft"
+version = "0.1.0"
+edition = "2021"
+authors = ["HFT Trading Team"]
+description = "Ultra-fast High-Frequency Trading system in Rust"
+license = "MIT"
+repository = "https://github.com/your-org/hft"
+
+[workspace]
+members = [
+    ".",
+    "crates/order-book",
+    "crates/latency-profiler",
+    "crates/event-processor",
+    "crates/trading-engine",
+    "crates/risk-manager",
+    "crates/market-data",
+    "crates/benchmarks"
+]
+
+[dependencies]
+# Workspace crates
+order-book = { path = "crates/order-book" }
+event-processor = { path = "crates/event-processor" }
+trading-engine = { path = "crates/trading-engine" }
+risk-manager = { path = "crates/risk-manager" }
+market-data = { path = "crates/market-data" }
+latency-profiler = { path = "crates/latency-profiler" }
+
+# Async runtime
+tokio = { version = "1.35", features = ["full", "rt-multi-thread", "macros"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+bincode = "1.3"
+
+# Lock-free collections and concurrency
+crossbeam = "0.8"
+crossbeam-channel = "0.5"
+crossbeam-skiplist = "0.1"
+dashmap = "5.5"
+parking_lot = "0.12"
+
+# High-performance allocator
+mimalloc = { version = "0.1", default-features = false }
+
+# Numeric types and SIMD
+num-traits = "0.2"
+num-derive = "0.4"
+fixed = "1.24"
+wide = "0.7"
+
+# Time and date handling
+chrono = { version = "0.4", features = ["serde"] }
+time = "0.3"
+
+# Logging and metrics
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+metrics = "0.22"
+metrics-exporter-prometheus = "0.13"
+
+# Utilities
+anyhow = "1.0"
+thiserror = "1.0"
+uuid = { version = "1.6", features = ["v4", "fast-rng", "serde"] }
+once_cell = "1.19"
+lazy_static = "1.4"
+
+# Network and I/O
+bytes = "1.5"
+futures = "0.3"
+
+# Configuration
+config = "0.14"
+toml = "0.8"
+
+# Testing
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[dev-dependencies]
+proptest = "1.4"
+tokio-test = "0.4"
+quickcheck = "1.0"
+quickcheck_macros = "1.0"
+
+[profile.release]
+# Maximum performance optimizations
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+overflow-checks = false
+debug-assertions = false
+strip = true
+
+# Profile for development with some optimizations
+[profile.dev-optimized]
+inherits = "dev"
+opt-level = 2
+debug = true
+overflow-checks = true
+
+# Profile for benchmarks
+[profile.bench]
+inherits = "release"
+debug = true
+lto = "thin"
+
+# Enable unstable features for maximum performance
+[package.metadata.docs.rs]
+rustdoc-args = ["--cfg", "docsrs"]
+
+# Workspace-level configuration
+[workspace.dependencies]
+# Common dependencies shared across workspace members
+serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "1.35", features = ["full"] }
+crossbeam = "0.8"
+anyhow = "1.0"
+tracing = "0.1"

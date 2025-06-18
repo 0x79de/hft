@@ -1,0 +1,21 @@
+[package]
+name = "event-processor"
+version = "0.1.0"
+edition = "2021"
+authors = ["HFT Trading Team"]
+description = "High-performance event processing system for HFT trading"
+
+[dependencies]
+serde = { workspace = true }
+tokio = { workspace = true }
+crossbeam = { workspace = true }
+crossbeam-channel = "0.5"
+parking_lot = "0.12"
+futures = "0.3"
+num_cpus = "1.16"
+order-book = { path = "../order-book" }
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.6", features = ["v4", "fast-rng", "serde"] }
+tracing = { workspace = true }
+anyhow = { workspace = true }
+thiserror = "1.0"

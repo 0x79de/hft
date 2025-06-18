@@ -1,0 +1,22 @@
+[package]
+name = "trading-engine"
+version = "0.1.0"
+edition = "2021"
+authors = ["HFT Trading Team"]
+description = "Core trading engine with multi-symbol support and risk management"
+
+[dependencies]
+serde = { workspace = true }
+tokio = { workspace = true }
+config = "0.14"
+toml = "0.8"
+parking_lot = "0.12"
+dashmap = "5.5"
+order-book = { path = "../order-book" }
+event-processor = { path = "../event-processor" }
+risk-manager = { path = "../risk-manager" }
+market-data = { path = "../market-data" }
+latency-profiler = { path = "../latency-profiler" }
+tracing = { workspace = true }
+anyhow = { workspace = true }
+thiserror = "1.0"

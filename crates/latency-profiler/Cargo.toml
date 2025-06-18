@@ -1,0 +1,19 @@
+[package]
+name = "latency-profiler"
+version = "0.1.0"
+edition = "2021"
+authors = ["HFT Trading Team"]
+description = "Nanosecond precision latency profiler for HFT systems"
+
+[dependencies]
+serde = { workspace = true }
+chrono = { version = "0.4", features = ["serde"] }
+time = "0.3"
+metrics = "0.22"
+csv = "1.3"
+hdrhistogram = "7.5"
+parking_lot = "0.12"
+once_cell = "1.19"
+tracing = { workspace = true }
+anyhow = { workspace = true }
+thiserror = "1.0"

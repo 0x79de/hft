@@ -1,0 +1,20 @@
+[package]
+name = "market-data"
+version = "0.1.0"
+edition = "2021"
+authors = ["HFT Trading Team"]
+description = "Real-time market data streaming and processing"
+
+[dependencies]
+serde = { workspace = true }
+tokio = { workspace = true }
+bytes = "1.5"
+futures = "0.3"
+crossbeam-channel = "0.5"
+parking_lot = "0.12"
+chrono = { version = "0.4", features = ["serde"] }
+bincode = "1.3"
+order-book = { path = "../order-book" }
+tracing = { workspace = true }
+anyhow = { workspace = true }
+thiserror = "1.0"
