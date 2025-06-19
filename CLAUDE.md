@@ -28,7 +28,8 @@ Set up the basic project structure with Cargo.toml dependencies for:
 ```
 
 ### Phase 2: Core Data Structures
-```
+
+```text
 Design Rust data structures for HFT trading system:
 1. Fixed-point Price type for deterministic arithmetic
 2. Order struct with all necessary fields
@@ -45,7 +46,8 @@ Implement these with:
 ```
 
 ### Phase 3: Lock-Free Order Book Implementation
-```
+
+```text
 Create a high-performance order book using:
 - SkipMap for price levels (O(log n) operations)
 - Lock-free algorithms for concurrent access
@@ -62,7 +64,8 @@ The order book should handle:
 ```
 
 ### Phase 4: Event Processing System
-```
+
+```text
 Design an event-driven architecture with:
 - MPMC channels for order events
 - Batched processing for high throughput
@@ -81,7 +84,8 @@ Events to handle:
 ```
 
 ### Phase 5: Advanced Latency Profiler
-```
+
+```text
 Build a comprehensive latency measurement system:
 - Nanosecond precision timing
 - Per-operation statistics (min, max, avg, percentiles)
@@ -94,7 +98,8 @@ Build a comprehensive latency measurement system:
 ```
 
 ### Phase 6: Trading Engine Core
-```
+
+```text
 Implement the main trading engine with:
 - Multi-symbol support
 - Risk management integration
@@ -107,7 +112,8 @@ Implement the main trading engine with:
 ```
 
 ### Phase 7: Benchmarking Framework
-```
+
+```text
 Create comprehensive benchmarks for:
 - Order processing throughput
 - Latency percentiles under load
@@ -120,7 +126,8 @@ Create comprehensive benchmarks for:
 ```
 
 ### Phase 8: Integration & Testing
-```
+
+```text
 Develop testing infrastructure:
 - Unit tests for all components
 - Integration tests for workflows

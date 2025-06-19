@@ -239,3 +239,5 @@ fix_logs/
 # Memory dumps
 *.dump
 *.heap
+
+CLAUDE.md
