@@ -1,0 +1,32 @@
+# HFT Integrations Configuration Example
+# Copy to integration-config.toml and fill in your actual credentials
+
+[okx]
+api_key = "your_okx_api_key_here"
+secret_key = "your_okx_secret_key_here"  # Base64 encoded
+passphrase = "your_okx_passphrase_here"
+sandbox = true  # Set to false for production
+timeout_ms = 5000
+rate_limit_requests_per_second = 20
+
+[mcp]
+server_url = "http://localhost:8000"
+api_key = "your_mcp_api_key_here"  # Optional
+timeout_ms = 1000
+max_retries = 3
+prediction_threshold = 0.7
+
+[rag]
+server_url = "http://localhost:8001"
+api_key = "your_rag_api_key_here"  # Optional
+timeout_ms = 500
+max_retries = 2
+query_threshold = 0.6
+top_k = 10
+
+[coordinator]
+signal_processing_interval_ms = 100
+health_check_interval_ms = 5000
+max_concurrent_requests = 100
+decision_timeout_ms = 50
+consensus_threshold = 0.7
