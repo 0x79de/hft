@@ -31,7 +31,7 @@ impl LatencyMetrics {
         self.sum_ns += ns;
         self.min_ns = self.min_ns.min(ns);
         self.max_ns = self.max_ns.max(ns);
-        self.sum_squared_ns += (ns as u128) * (ns as u128);
+        self.sum_squared_ns += u128::from(ns) * u128::from(ns);
     }
     
     #[inline]

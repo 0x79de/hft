@@ -13,10 +13,6 @@ path = "src/order_book_bench.rs"
 name = "bench_latency"
 path = "src/latency_bench.rs"
 
-[[bin]]
-name = "bench_throughput"
-path = "src/throughput_bench.rs"
-
 [dependencies]
 serde = { workspace = true }
 tokio = { workspace = true }

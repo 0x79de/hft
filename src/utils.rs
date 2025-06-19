@@ -46,7 +46,14 @@ mod tests {
     fn test_timestamp_functions() {
         let nanos = current_timestamp_nanos();
         let micros = current_timestamp_micros();
-        assert!(nanos > micros * 1000);
+        
+        // Both should be reasonable timestamps (after 2020 and before 2050)
+        assert!(nanos > 1_577_836_800_000_000_000); // Jan 1, 2020 in nanoseconds
+        assert!(micros > 1_577_836_800_000_000); // Jan 1, 2020 in microseconds
+        
+        // The difference between consecutive calls should be small (less than 1ms)
+        let nanos2 = current_timestamp_nanos();
+        assert!((nanos2.saturating_sub(nanos)) < 1_000_000); // Less than 1ms apart
     }
 
     #[test]

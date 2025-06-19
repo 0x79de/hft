@@ -2,9 +2,14 @@
 /target/
 **/*.rs.bk
 *.pdb
+*.exe
+*.dll
+*.so
+*.dylib
+*.rlib
 
-# Cargo
-Cargo.lock
+# Cargo (keep Cargo.lock for applications, ignore for libraries)
+# Cargo.lock
 
 # IDE files
 .vscode/
@@ -36,9 +41,6 @@ Cargo.lock
 Network Trash Folder
 Temporary Items
 .apdisk
-
-# Linux
-*~
 
 # temporary files which can be created if a process still has a handle open of a deleted file
 .fuse_hidden*
@@ -96,31 +98,48 @@ coverage/
 .nyc_output
 
 # HFT specific files
-# Market data cache
+# Market data cache and feeds
 data/
 cache/
 *.cache
+market_data/
+tick_data/
+*.csv
+*.parquet
+*.feather
 
 # Trading logs and analytics
 trading_logs/
 analytics/
 backtest_results/
 performance_data/
+audit_logs/
+execution_reports/
+*.trade
+*.execution
 
 # Configuration files with sensitive data
 config/production.toml
 config/secrets.toml
+config/api_keys.toml
 *.env
 .env*
+secrets/
+credentials/
 
-# Benchmark results
+# Benchmark results and performance data
 benchmark_results/
 *.benchmark
+latency_measurements/
+*.csv
+performance_profiles/
 
 # Profiling data
 *.prof
 perf.data*
 flamegraph.svg
+*.perf
+callgrind.out.*
 
 # Core dumps
 core
@@ -166,16 +185,57 @@ node_modules/
 *.zip
 
 # Editor backup files
-*~
 .#*
 \#*#
 
-# Rust-analyzer
-.rust-analyzer/
-
-# Documentation files (development notes)
+# Documentation files (development notes) - remove CLAUDE.md since it's needed
 PERFORMANCE.md
 ROADMAP.md
-CLAUDE.md
 CLAUDE_DEVELOPMENT.md
 ARCHITECTURE.md
+
+# Test artifacts
+test_results/
+test_data/
+coverage_reports/
+
+# Temporary exchange connection files
+*.session
+*.token
+exchange_cache/
+
+# Risk management data
+risk_logs/
+position_snapshots/
+pnl_reports/
+
+# Rust-specific additions
+# RLS and rust-analyzer cache
+.rls/
+.rust-analyzer/
+
+# Criterion benchmark data
+/target/criterion/
+
+# Generated documentation
+/target/doc/
+
+# Clippy cache
+.clippy_cache/
+
+# Additional HFT-specific patterns
+# Order book snapshots
+snapshots/
+*.snapshot
+
+# FIX protocol logs
+fix_logs/
+*.fix
+
+# Binary market data
+*.bin
+*.dat
+
+# Memory dumps
+*.dump
+*.heap

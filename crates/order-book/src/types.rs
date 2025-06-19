@@ -138,6 +138,11 @@ impl Quantity {
     pub fn to_raw(self) -> u64 {
         self.0.to_bits()
     }
+    
+    #[inline]
+    pub fn abs(self) -> Self {
+        self // Quantity is always positive (unsigned)
+    }
 }
 
 impl fmt::Display for Quantity {
@@ -392,7 +397,7 @@ static TRADE_ID_COUNTER: AtomicU64 = AtomicU64::new(1);
 impl Trade {
     #[inline]
     pub fn new(
-        symbol: String,
+        symbol: &str,
         buyer_order_id: OrderId,
         seller_order_id: OrderId,
         price: Price,
@@ -402,7 +407,7 @@ impl Trade {
     ) -> Self {
         Self {
             id: TRADE_ID_COUNTER.fetch_add(1, AtomicOrdering::Relaxed),
-            symbol,
+            symbol: symbol.to_string(),
             buyer_order_id,
             seller_order_id,
             price,
@@ -503,5 +508,238 @@ impl MarketSnapshot {
     #[inline]
     pub fn total_ask_volume(&self) -> Quantity {
         self.asks.iter().map(|(_, qty)| *qty).fold(Quantity::ZERO, |acc, qty| acc + qty)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_price_creation_and_conversion() {
+        let price = Price::new(100.5);
+        assert!((price.to_f64() - 100.5).abs() < 0.000001);
+        
+        let raw = price.to_raw();
+        let price2 = Price::from_raw(raw);
+        assert_eq!(price, price2);
+    }
+
+    #[test]
+    fn test_price_arithmetic() {
+        let p1 = Price::new(100.0);
+        let p2 = Price::new(50.0);
+        
+        assert_eq!((p1 + p2).to_f64(), 150.0);
+        assert_eq!((p1 - p2).to_f64(), 50.0);
+        assert_eq!((p1 * 2.0).to_f64(), 200.0);
+        assert_eq!((p1 / 2.0).to_f64(), 50.0);
+        
+        let mut p3 = p1;
+        p3 += p2;
+        assert_eq!(p3.to_f64(), 150.0);
+        
+        p3 -= p2;
+        assert_eq!(p3.to_f64(), 100.0);
+    }
+
+    #[test]
+    fn test_price_ordering() {
+        let p1 = Price::new(100.0);
+        let p2 = Price::new(200.0);
+        let p3 = Price::new(100.0);
+        
+        assert!(p1 < p2);
+        assert!(p2 > p1);
+        assert_eq!(p1, p3);
+        assert!(p1 <= p3);
+        assert!(p1 >= p3);
+    }
+
+    #[test]
+    fn test_quantity_operations() {
+        let q1 = Quantity::new(100.0);
+        let q2 = Quantity::new(50.0);
+        
+        assert_eq!((q1 + q2).to_f64(), 150.0);
+        assert_eq!((q1 - q2).to_f64(), 50.0);
+        
+        let mut q3 = q1;
+        q3 += q2;
+        assert_eq!(q3.to_f64(), 150.0);
+    }
+
+    #[test]
+    fn test_side_operations() {
+        assert_eq!(Side::Buy.opposite(), Side::Sell);
+        assert_eq!(Side::Sell.opposite(), Side::Buy);
+        
+        assert!(Side::Buy.is_buy());
+        assert!(!Side::Buy.is_sell());
+        assert!(Side::Sell.is_sell());
+        assert!(!Side::Sell.is_buy());
+    }
+
+    #[test]
+    fn test_order_id_generation() {
+        let id1 = OrderId::new();
+        let id2 = OrderId::new();
+        
+        assert_ne!(id1, id2);
+        assert!(id1.to_raw() < id2.to_raw());
+        
+        let id3 = OrderId::from_raw(12345);
+        assert_eq!(id3.to_raw(), 12345);
+    }
+
+    #[test]
+    fn test_order_creation_and_filling() {
+        let client_id = Uuid::new_v4();
+        let mut order = Order::new(
+            "BTCUSD".to_string(),
+            Side::Buy,
+            OrderType::Limit,
+            Price::new(50000.0),
+            Quantity::new(1.0),
+            client_id,
+        );
+        
+        assert_eq!(order.remaining_quantity(), Quantity::new(1.0));
+        assert!(!order.is_fully_filled());
+        assert_eq!(order.status, OrderStatus::Pending);
+        
+        order.fill(Quantity::new(0.5));
+        assert_eq!(order.filled_quantity, Quantity::new(0.5));
+        assert_eq!(order.remaining_quantity(), Quantity::new(0.5));
+        assert!(!order.is_fully_filled());
+        assert_eq!(order.status, OrderStatus::PartiallyFilled);
+        
+        order.fill(Quantity::new(0.5));
+        assert_eq!(order.filled_quantity, Quantity::new(1.0));
+        assert_eq!(order.remaining_quantity(), Quantity::ZERO);
+        assert!(order.is_fully_filled());
+        assert_eq!(order.status, OrderStatus::Filled);
+    }
+
+    #[test]
+    fn test_order_cancel_and_reject() {
+        let client_id = Uuid::new_v4();
+        let mut order = Order::new(
+            "BTCUSD".to_string(),
+            Side::Buy,
+            OrderType::Limit,
+            Price::new(50000.0),
+            Quantity::new(1.0),
+            client_id,
+        );
+        
+        order.cancel();
+        assert_eq!(order.status, OrderStatus::Cancelled);
+        
+        let mut order2 = Order::new(
+            "BTCUSD".to_string(),
+            Side::Buy,
+            OrderType::Limit,
+            Price::new(50000.0),
+            Quantity::new(1.0),
+            client_id,
+        );
+        
+        order2.reject();
+        assert_eq!(order2.status, OrderStatus::Rejected);
+    }
+
+    #[test]
+    fn test_trade_creation() {
+        let buyer_id = Uuid::new_v4();
+        let seller_id = Uuid::new_v4();
+        let buyer_order_id = OrderId::new();
+        let seller_order_id = OrderId::new();
+        
+        let trade = Trade::new(
+            "BTCUSD",
+            buyer_order_id,
+            seller_order_id,
+            Price::new(50000.0),
+            Quantity::new(1.0),
+            buyer_id,
+            seller_id,
+        );
+        
+        assert_eq!(trade.notional_value(), 50000.0);
+        assert_eq!(trade.buyer_order_id, buyer_order_id);
+        assert_eq!(trade.seller_order_id, seller_order_id);
+    }
+
+    #[test]
+    fn test_market_data_operations() {
+        let mut md = MarketData::new("BTCUSD".to_string());
+        
+        md.best_bid = Some(Price::new(49950.0));
+        md.best_ask = Some(Price::new(50050.0));
+        
+        assert_eq!(md.spread(), Some(Price::new(100.0)));
+        assert_eq!(md.mid_price(), Some(Price::new(50000.0)));
+        
+        md.update_trade(Price::new(50000.0), Quantity::new(1.0));
+        assert_eq!(md.last_trade_price, Some(Price::new(50000.0)));
+        assert_eq!(md.volume, Quantity::new(1.0));
+    }
+
+    #[test]
+    fn test_market_snapshot() {
+        let mut snapshot = MarketSnapshot::new("BTCUSD".to_string());
+        
+        snapshot.bids.push((Price::new(49950.0), Quantity::new(1.0)));
+        snapshot.bids.push((Price::new(49940.0), Quantity::new(2.0)));
+        snapshot.asks.push((Price::new(50050.0), Quantity::new(1.5)));
+        snapshot.asks.push((Price::new(50060.0), Quantity::new(2.5)));
+        
+        assert_eq!(snapshot.total_bid_volume(), Quantity::new(3.0));
+        assert_eq!(snapshot.total_ask_volume(), Quantity::new(4.0));
+    }
+
+    #[test]
+    fn test_constants() {
+        assert_eq!(Price::ZERO.to_f64(), 0.0);
+        assert_eq!(Quantity::ZERO.to_f64(), 0.0);
+        
+        assert!(Price::MAX.to_f64() > 0.0);
+        assert!(Quantity::MAX.to_f64() > 0.0);
+    }
+
+    #[test]
+    fn test_display_formatting() {
+        let price = Price::new(123.456789);
+        let quantity = Quantity::new(987.654321);
+        let side = Side::Buy;
+        let order_id = OrderId::from_raw(12345);
+        
+        assert!(!format!("{}", price).is_empty());
+        assert!(!format!("{}", quantity).is_empty());
+        assert_eq!(format!("{}", side), "BUY");
+        assert_eq!(format!("{}", order_id), "12345");
+    }
+
+    #[test] 
+    fn test_serialization() {
+        let price = Price::new(123.45);
+        let serialized = serde_json::to_string(&price).unwrap();
+        let deserialized: Price = serde_json::from_str(&serialized).unwrap();
+        assert_eq!(price, deserialized);
+        
+        let client_id = Uuid::new_v4();
+        let order = Order::new(
+            "BTCUSD".to_string(),
+            Side::Buy,
+            OrderType::Limit,
+            Price::new(50000.0),
+            Quantity::new(1.0),
+            client_id,
+        );
+        
+        let serialized = serde_json::to_string(&order).unwrap();
+        let deserialized: Order = serde_json::from_str(&serialized).unwrap();
+        assert_eq!(order, deserialized);
     }
 }

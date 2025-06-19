@@ -1,0 +1,8 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 8bc852121c2fe5030d90711261d030238da81c302e2d1c8094fded812d7cb11d # shrinks to a = 441343.16485313454, b = 0.0, c = 0.1
+cc 007781050ff893e6784cbab4b0e8edce9f9c94e8bf5ba52746f7be99091fb9bf # shrinks to orders = [Order { id: OrderId(11764), symbol: "AAAUSD", side: Buy, order_type: Market, price: Price(673813.86), quantity: Quantity(0.02), filled_quantity: Quantity(0), status: Pending, timestamp: 2025-06-18T19:24:54.336632Z, client_id: f24a32b9-117f-4480-b756-62e3a1e8ab0a }, Order { id: OrderId(11765), symbol: "AAAUSD", side: Buy, order_type: Market, price: Price(0.02), quantity: Quantity(0.02), filled_quantity: Quantity(0), status: Pending, timestamp: 2025-06-18T19:24:54.336634Z, client_id: c3f3f77a-f28d-4325-8a83-14f22e5a832a }, Order { id: OrderId(11767), symbol: "AAAUSD", side: Sell, order_type: Market, price: Price(536937.16), quantity: Quantity(0.02), filled_quantity: Quantity(0), status: Pending, timestamp: 2025-06-18T19:24:54.336636Z, client_id: 67bb2d16-1a40-459d-8daa-7a5a8392308d }]

@@ -1,10 +1,11 @@
-# Ultra-Fast HFT Trading System - Rust Implementation
+# HFT Trading System - Rust Implementation
 
 > A complete rewrite of the high-frequency trading order book system in Rust, designed for ultra-low latency and maximum throughput.
 
 ## 🚀 Features
 
 ### Core Trading Engine
+
 - **Sub-microsecond latency** order matching
 - **Lock-free order book** with SkipMap data structure
 - **Multi-symbol support** for various trading pairs
@@ -13,6 +14,7 @@
 - **Risk management** with position limits
 
 ### Performance Optimizations
+
 - **Zero-copy message passing** with crossbeam channels
 - **Custom memory allocator** (mimalloc) for better performance
 - **SIMD-ready algorithms** for parallel processing
@@ -21,6 +23,7 @@
 - **Async/await** for high concurrency
 
 ### Advanced Features
+
 - **Comprehensive latency profiler** with nanosecond precision
 - **Event-driven architecture** for scalability
 - **Automated benchmarking** suite
@@ -60,7 +63,7 @@ cargo run --release --bin benchmark
 
 ## 🏗️ Project Structure
 
-```
+```bash
 hft-order-book-rust/
 ├── src/
 │   ├── main.rs              # Main application entry
@@ -135,6 +138,7 @@ cargo run --release --bin benchmark -- --config benchmarks/config.toml
 ## 📊 Performance Metrics
 
 ### Target Performance (Rust Implementation)
+
 - **Order Processing**: < 500ns average latency
 - **Throughput**: > 1,000,000 orders/second
 - **Memory Usage**: < 100MB for 1M orders
@@ -142,6 +146,7 @@ cargo run --release --bin benchmark -- --config benchmarks/config.toml
 - **Jitter**: < 100ns P99 latency variation
 
 ### Comparison with C++ Version
+
 | Metric | C++ Version | Rust Version | Improvement |
 |--------|-------------|--------------|-------------|
 | Average Latency | 800ns | 450ns | 44% faster |
@@ -172,6 +177,7 @@ cargo test --release --features leak-check
 ## 🔧 Configuration
 
 ### Environment Variables
+
 ```bash
 export HFT_LOG_LEVEL=info
 export HFT_CPU_AFFINITY=0,1,2,3
@@ -180,6 +186,7 @@ export HFT_HUGEPAGES=enabled
 ```
 
 ### Configuration File (config.toml)
+
 ```toml
 [trading]
 max_orders_per_second = 100000
@@ -202,6 +209,7 @@ export_format = "prometheus"
 ## 📈 Monitoring
 
 ### Built-in Metrics
+
 - Order processing latency (P50, P95, P99)
 - Throughput (orders/second)
 - Memory usage and allocation patterns
@@ -210,6 +218,7 @@ export_format = "prometheus"
 - Error rates and types
 
 ### Prometheus Integration
+
 ```bash
 # Start with Prometheus metrics
 cargo run --release --features prometheus
@@ -223,6 +232,7 @@ curl http://localhost:8080/metrics
 We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
 ### Development Workflow
+
 1. Fork the repository
 2. Create a feature branch
 3. Use Claude AI assistance (see [CLAUDE.md](CLAUDE.md))

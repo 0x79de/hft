@@ -17,3 +17,7 @@ once_cell = "1.19"
 tracing = { workspace = true }
 anyhow = { workspace = true }
 thiserror = "1.0"
+
+[dev-dependencies]
+tokio = { workspace = true }
+proptest = "1.4"
