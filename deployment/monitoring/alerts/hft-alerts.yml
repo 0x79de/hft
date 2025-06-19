@@ -1,0 +1,181 @@
+# HFT Trading System Alerting Rules
+
+groups:
+  - name: hft_trading_alerts
+    interval: 10s
+    rules:
+      # High-severity alerts
+      - alert: HFTSystemDown
+        expr: up{job="hft-trading"} == 0
+        for: 30s
+        labels:
+          severity: critical
+          service: hft-trading
+        annotations:
+          summary: "HFT Trading System is down"
+          description: "The HFT trading system has been down for more than 30 seconds"
+          runbook_url: "https://docs.company.com/runbooks/hft-system-down"
+
+      - alert: HFTHighLatency
+        expr: hft_order_latency_p99 > 10000  # 10μs in nanoseconds
+        for: 1m
+        labels:
+          severity: critical
+          service: hft-trading
+        annotations:
+          summary: "HFT system experiencing high latency"
+          description: "P99 order latency is {{ $value }}ns, above 10μs threshold"
+          runbook_url: "https://docs.company.com/runbooks/high-latency"
+
+      - alert: HFTOrderBookCorruption
+        expr: hft_order_book_spread_invalid > 0
+        for: 10s
+        labels:
+          severity: critical
+          service: hft-trading
+        annotations:
+          summary: "Order book spread corruption detected"
+          description: "Invalid spread detected in order book for symbol {{ $labels.symbol }}"
+          runbook_url: "https://docs.company.com/runbooks/order-book-corruption"
+
+      - alert: HFTRiskLimitBreach
+        expr: hft_risk_limit_breached > 0
+        for: 0s  # Immediate alert
+        labels:
+          severity: critical
+          service: hft-trading
+        annotations:
+          summary: "Risk limit breached"
+          description: "Risk limit breached for {{ $labels.limit_type }} on {{ $labels.symbol }}"
+          runbook_url: "https://docs.company.com/runbooks/risk-limit-breach"
+
+      # Warning-level alerts
+      - alert: HFTHighThroughputDrop
+        expr: rate(hft_orders_processed_total[5m]) < 1000  # Less than 1K orders/sec
+        for: 2m
+        labels:
+          severity: warning
+          service: hft-trading
+        annotations:
+          summary: "HFT throughput dropped significantly"
+          description: "Order processing rate dropped to {{ $value }} orders/sec"
+          runbook_url: "https://docs.company.com/runbooks/low-throughput"
+
+      - alert: HFTMemoryUsageHigh
+        expr: (hft_memory_usage_bytes / hft_memory_limit_bytes) > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          service: hft-trading
+        annotations:
+          summary: "HFT system memory usage high"
+          description: "Memory usage is {{ $value | humanizePercentage }} of limit"
+          runbook_url: "https://docs.company.com/runbooks/high-memory"
+
+      - alert: HFTCPUUsageHigh
+        expr: rate(hft_cpu_seconds_total[5m]) > 0.8
+        for: 5m
+        labels:
+          severity: warning
+          service: hft-trading
+        annotations:
+          summary: "HFT system CPU usage high"
+          description: "CPU usage is {{ $value | humanizePercentage }}"
+          runbook_url: "https://docs.company.com/runbooks/high-cpu"
+
+      - alert: HFTErrorRateHigh
+        expr: rate(hft_errors_total[5m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+          service: hft-trading
+        annotations:
+          summary: "High error rate in HFT system"
+          description: "Error rate is {{ $value }} errors/sec"
+          runbook_url: "https://docs.company.com/runbooks/high-error-rate"
+
+      # Performance degradation alerts
+      - alert: HFTLatencyP95High
+        expr: hft_order_latency_p95 > 5000  # 5μs
+        for: 2m
+        labels:
+          severity: warning
+          service: hft-trading
+        annotations:
+          summary: "HFT P95 latency elevated"
+          description: "P95 latency is {{ $value }}ns, above 5μs threshold"
+
+      - alert: HFTOrderBookDepthLow
+        expr: hft_order_book_depth < 10
+        for: 1m
+        labels:
+          severity: warning
+          service: hft-trading
+        annotations:
+          summary: "Order book depth low"
+          description: "Order book depth for {{ $labels.symbol }} is only {{ $value }} levels"
+
+      - alert: HFTConnectionsHigh
+        expr: hft_active_connections > 800
+        for: 2m
+        labels:
+          severity: warning
+          service: hft-trading
+        annotations:
+          summary: "High number of active connections"
+          description: "{{ $value }} active connections, approaching limit"
+
+      # Market data alerts
+      - alert: HFTMarketDataStale
+        expr: time() - hft_market_data_last_update > 10
+        for: 30s
+        labels:
+          severity: warning
+          service: hft-trading
+        annotations:
+          summary: "Market data feed stale"
+          description: "No market data updates for {{ $labels.symbol }} in {{ $value }}s"
+
+      - alert: HFTMarketDataGap
+        expr: hft_market_data_gaps_total > 0
+        for: 1m
+        labels:
+          severity: warning
+          service: hft-trading
+        annotations:
+          summary: "Market data gaps detected"
+          description: "{{ $value }} gaps detected in market data feed"
+
+  - name: hft_infrastructure_alerts
+    interval: 30s
+    rules:
+      # Infrastructure alerts
+      - alert: HFTDiskSpaceHigh
+        expr: (1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes)) > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          service: infrastructure
+        annotations:
+          summary: "Disk space usage high"
+          description: "Disk usage on {{ $labels.device }} is {{ $value | humanizePercentage }}"
+
+      - alert: HFTNetworkLatencyHigh
+        expr: hft_network_latency_ms > 1
+        for: 2m
+        labels:
+          severity: warning
+          service: infrastructure
+        annotations:
+          summary: "Network latency high"
+          description: "Network latency to {{ $labels.destination }} is {{ $value }}ms"
+
+      - alert: HFTClockSkew
+        expr: abs(hft_clock_skew_seconds) > 0.1
+        for: 1m
+        labels:
+          severity: critical
+          service: infrastructure
+        annotations:
+          summary: "Clock skew detected"
+          description: "System clock is {{ $value }}s off from reference time"

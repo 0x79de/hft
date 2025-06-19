@@ -1,0 +1,316 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hft-trading-system
+  namespace: hft
+  labels:
+    app: hft-trading
+    version: "1.0.0"
+    component: trading-engine
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: hft-trading
+  template:
+    metadata:
+      labels:
+        app: hft-trading
+        version: "1.0.0"
+        component: trading-engine
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      # Security context
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      
+      # Node selection for performance
+      nodeSelector:
+        kubernetes.io/arch: amd64
+        node-type: high-performance
+      
+      # Anti-affinity to spread across nodes
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - hft-trading
+              topologyKey: kubernetes.io/hostname
+      
+      # Tolerations for dedicated nodes
+      tolerations:
+      - key: "trading-workload"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+      
+      containers:
+      - name: hft-trading
+        image: hft/trading-system:1.0.0
+        imagePullPolicy: Always
+        
+        # Resource requirements
+        resources:
+          requests:
+            cpu: "2"
+            memory: "4Gi"
+            ephemeral-storage: "1Gi"
+          limits:
+            cpu: "4"
+            memory: "8Gi"
+            ephemeral-storage: "2Gi"
+        
+        # Ports
+        ports:
+        - name: metrics
+          containerPort: 8080
+          protocol: TCP
+        - name: api
+          containerPort: 9090
+          protocol: TCP
+        
+        # Environment variables
+        env:
+        - name: RUST_LOG
+          value: "info"
+        - name: HFT_CONFIG_PATH
+          value: "/app/config/production.toml"
+        - name: HFT_LOG_LEVEL
+          value: "info"
+        - name: HFT_METRICS_PORT
+          value: "8080"
+        - name: HFT_ENABLE_PROFILING
+          value: "true"
+        - name: RUST_BACKTRACE
+          value: "1"
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        
+        # Volume mounts
+        volumeMounts:
+        - name: config
+          mountPath: /app/config
+          readOnly: true
+        - name: logs
+          mountPath: /app/logs
+        - name: data
+          mountPath: /app/data
+        - name: tmp
+          mountPath: /tmp
+        
+        # Security context
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+        
+        # Health checks
+        livenessProbe:
+          exec:
+            command:
+            - /app/hft
+            - --health-check
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        
+        # Startup probe for slow starting containers
+        startupProbe:
+          exec:
+            command:
+            - /app/hft
+            - --health-check
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 10
+      
+      # Volumes
+      volumes:
+      - name: config
+        configMap:
+          name: hft-config
+      - name: logs
+        emptyDir:
+          sizeLimit: 10Gi
+      - name: data
+        persistentVolumeClaim:
+          claimName: hft-data
+      - name: tmp
+        emptyDir:
+          sizeLimit: 1Gi
+      
+      # Restart policy
+      restartPolicy: Always
+      
+      # DNS configuration
+      dnsPolicy: ClusterFirst
+      
+      # Termination grace period
+      terminationGracePeriodSeconds: 60
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: hft-trading-service
+  namespace: hft
+  labels:
+    app: hft-trading
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"
+    prometheus.io/path: "/metrics"
+spec:
+  type: ClusterIP
+  ports:
+  - name: metrics
+    port: 8080
+    targetPort: 8080
+    protocol: TCP
+  - name: api
+    port: 9090
+    targetPort: 9090
+    protocol: TCP
+  selector:
+    app: hft-trading
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hft-config
+  namespace: hft
+data:
+  production.toml: |
+    # HFT Trading System Kubernetes Configuration
+    [system]
+    name = "HFT-Trading-System-K8s"
+    version = "1.0.0"
+    environment = "production"
+    max_workers = 4
+    
+    [trading]
+    enabled_symbols = ["BTCUSD", "ETHUSD", "SOLUSD"]
+    enable_auto_trading = true
+    max_orders_per_second = 50000
+    
+    [latency_profiling]
+    enabled = true
+    sample_rate = 1.0
+    enable_prometheus_export = true
+    
+    [monitoring]
+    enable_metrics = true
+    metrics_port = 8080
+    enable_prometheus = true
+    
+    [logging]
+    level = "info"
+    format = "json"
+    output = "stdout"
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hft-data
+  namespace: hft
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+  storageClassName: fast-ssd
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: hft-trading-pdb
+  namespace: hft
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: hft-trading
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: hft-trading-hpa
+  namespace: hft
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: hft-trading-system
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 15
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 10
+        periodSeconds: 60
