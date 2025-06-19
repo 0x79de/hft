@@ -1,0 +1,194 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "HFT Trading System Dashboard",
+    "tags": ["hft", "trading", "performance"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "System Overview",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "up{job=\"hft-trading\"}",
+            "legendFormat": "System Status"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "green", "value": 1}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Order Processing Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(hft_orders_processed_total[1m])",
+            "legendFormat": "Orders/sec"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Orders per second",
+            "min": 0
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4}
+      },
+      {
+        "id": 3,
+        "title": "Latency Percentiles",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "hft_order_latency_p50",
+            "legendFormat": "P50"
+          },
+          {
+            "expr": "hft_order_latency_p95",
+            "legendFormat": "P95"
+          },
+          {
+            "expr": "hft_order_latency_p99",
+            "legendFormat": "P99"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Latency (nanoseconds)",
+            "min": 0,
+            "logBase": 10
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4}
+      },
+      {
+        "id": 4,
+        "title": "Order Book Depth",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "hft_order_book_depth{side=\"buy\"}",
+            "legendFormat": "Buy Side - {{symbol}}"
+          },
+          {
+            "expr": "hft_order_book_depth{side=\"sell\"}",
+            "legendFormat": "Sell Side - {{symbol}}"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Number of Orders",
+            "min": 0
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12}
+      },
+      {
+        "id": 5,
+        "title": "Memory Usage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "hft_memory_usage_bytes",
+            "legendFormat": "Memory Used"
+          },
+          {
+            "expr": "hft_memory_limit_bytes",
+            "legendFormat": "Memory Limit"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Bytes",
+            "min": 0
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12}
+      },
+      {
+        "id": 6,
+        "title": "Risk Metrics",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "hft_position_size",
+            "legendFormat": "Position Size"
+          },
+          {
+            "expr": "hft_daily_pnl",
+            "legendFormat": "Daily PnL"
+          },
+          {
+            "expr": "hft_risk_utilization",
+            "legendFormat": "Risk Utilization %"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20}
+      },
+      {
+        "id": 7,
+        "title": "Error Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(hft_errors_total[5m])",
+            "legendFormat": "Errors/sec - {{error_type}}"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Errors per second",
+            "min": 0
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20}
+      },
+      {
+        "id": 8,
+        "title": "Market Data Feed Status",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "hft_market_data_connected",
+            "legendFormat": "{{symbol}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "green", "value": 1}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 4, "w": 24, "x": 0, "y": 28}
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "refresh": "5s",
+    "schemaVersion": 27,
+    "version": 1
+  }
+}

@@ -1,0 +1,193 @@
+# HFT Trading System Production Configuration
+
+[system]
+# System identification
+name = "HFT-Trading-System"
+version = "1.0.0"
+environment = "production"
+
+# Performance settings
+max_workers = 8
+worker_queue_size = 100000
+enable_numa_optimization = true
+
+[trading]
+# Trading engine configuration
+enabled_symbols = ["BTCUSD", "ETHUSD", "SOLUSD", "ADAUSD", "DOTUSD"]
+enable_auto_trading = true
+enable_cross_symbol_arbitrage = false
+
+# Order management
+max_orders_per_second = 100000
+max_orders_per_symbol = 50000
+order_timeout_ms = 30000
+
+# Price precision
+price_precision = 8
+quantity_precision = 6
+
+[matching_engine]
+# Matching engine performance
+enable_batch_matching = true
+batch_size = 1000
+batch_timeout_ms = 1
+
+# Price level management
+max_price_levels = 10000
+price_level_cleanup_interval_ms = 5000
+
+[risk_management]
+# Global risk limits
+max_daily_pnl = 1000000.0
+max_position_size = 100.0
+max_notional_exposure = 10000000.0
+
+# Per-symbol limits (can be overridden)
+default_position_limit = 10.0
+default_order_size_limit = 5.0
+default_price_deviation_limit = 0.05
+
+# Risk monitoring
+enable_real_time_monitoring = true
+risk_check_interval_ms = 100
+
+[latency_profiling]
+# Performance monitoring
+enabled = true
+sample_rate = 1.0  # Sample 100% of operations in production
+enable_histogram = true
+histogram_buckets = [1, 5, 10, 50, 100, 500, 1000, 5000, 10000]  # nanoseconds
+
+# Export settings
+export_interval_ms = 1000
+enable_csv_export = true
+csv_export_path = "/app/logs/latency"
+enable_prometheus_export = true
+
+[event_processing]
+# Event system configuration
+buffer_size = 100000
+worker_threads = 4
+flush_interval_ms = 5
+enable_priority_queue = true
+
+# Batch processing
+enable_batch_processing = true
+batch_size = 1000
+batch_timeout_ms = 1
+
+[market_data]
+# Market data configuration
+enable_market_data_feed = true
+snapshot_interval_ms = 100
+depth_levels = 10
+
+# Data sources
+enable_websocket_feed = true
+enable_rest_api_feed = false
+websocket_reconnect_interval_ms = 5000
+
+[logging]
+# Logging configuration
+level = "info"
+format = "json"
+output = "file"
+file_path = "/app/logs/hft.log"
+max_file_size_mb = 100
+max_files = 10
+
+# Component-specific logging
+[logging.components]
+trading_engine = "info"
+order_book = "warn"
+risk_manager = "info"
+latency_profiler = "debug"
+event_processor = "info"
+
+[monitoring]
+# Metrics and monitoring
+enable_metrics = true
+metrics_port = 8080
+enable_prometheus = true
+prometheus_path = "/metrics"
+
+# Health checks
+enable_health_checks = true
+health_check_interval_ms = 30000
+health_check_timeout_ms = 5000
+
+[security]
+# Security settings
+enable_tls = true
+tls_cert_path = "/app/config/certs/server.crt"
+tls_key_path = "/app/config/certs/server.key"
+
+# Authentication
+enable_authentication = true
+jwt_secret_path = "/app/config/secrets/jwt.secret"
+token_expiry_hours = 24
+
+[database]
+# Database configuration (if needed for persistence)
+enabled = false
+connection_string = "postgresql://user:pass@localhost/hft"
+max_connections = 10
+connection_timeout_ms = 5000
+
+[networking]
+# Network configuration
+bind_address = "0.0.0.0"
+api_port = 9090
+max_connections = 1000
+connection_timeout_ms = 30000
+
+# TCP tuning
+tcp_nodelay = true
+tcp_keepalive = true
+send_buffer_size = 65536
+recv_buffer_size = 65536
+
+[storage]
+# Data storage settings
+enable_persistence = true
+data_directory = "/app/data"
+snapshot_interval_minutes = 60
+max_snapshots = 24
+
+# Backup settings
+enable_backup = true
+backup_interval_hours = 6
+backup_directory = "/app/data/backups"
+
+[alerts]
+# Alerting configuration
+enable_alerts = true
+alert_channels = ["email", "webhook"]
+
+# Email settings
+smtp_server = "smtp.company.com"
+smtp_port = 587
+smtp_username = "alerts@company.com"
+smtp_password_path = "/app/config/secrets/smtp.password"
+
+# Webhook settings
+webhook_url = "https://alerts.company.com/webhook"
+webhook_timeout_ms = 5000
+
+[performance]
+# Performance tuning
+enable_cpu_affinity = true
+cpu_cores = [0, 1, 2, 3]  # Bind to specific CPU cores
+enable_huge_pages = true
+memory_pool_size_mb = 1024
+
+# Garbage collection tuning (if applicable)
+gc_strategy = "low_latency"
+max_heap_size_mb = 4096
+
+[development]
+# Development/debug settings (disabled in production)
+enable_debug_logging = false
+enable_test_mode = false
+mock_market_data = false
+simulation_mode = false
