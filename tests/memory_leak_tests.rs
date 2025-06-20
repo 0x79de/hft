@@ -5,7 +5,9 @@
 
 use std::sync::Arc;
 use std::thread;
-use std::time::{Duration, Instant};
+use std::time::Instant;
+#[cfg(target_os = "linux")]
+use std::time::Duration;
 use order_book::OrderBook;
 use order_book::types::{Order, OrderType, Side, Price, Quantity};
 use latency_profiler::LatencyProfiler;
