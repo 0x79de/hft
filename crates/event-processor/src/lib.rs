@@ -8,4 +8,4 @@ pub use events::*;
 pub use channels::*;
 pub use batch::BatchProcessor;
 
-pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
+pub type Result<T> = anyhow::Result<T>;

@@ -127,6 +127,11 @@ config/api_keys.toml
 secrets/
 credentials/
 
+# Integration configuration with API keys
+integration-config.toml
+*-config.toml
+!*-config.example.toml
+
 # Benchmark results and performance data
 benchmark_results/
 *.benchmark

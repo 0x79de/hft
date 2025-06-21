@@ -251,7 +251,7 @@ impl FeatureExtractor {
         
         // Bollinger band position should be in [0, 1]
         if let Some(bb_pos) = features.get_mut("bb_position") {
-            *bb_pos = bb_pos.max(0.0).min(1.0);
+            *bb_pos = bb_pos.clamp(0.0, 1.0);
         }
         
         // Hour of day to [0, 1]
@@ -268,7 +268,7 @@ impl FeatureExtractor {
         let momentum_features = ["price_momentum_1", "volume_momentum"];
         for feature in &momentum_features {
             if let Some(momentum) = features.get_mut(*feature) {
-                *momentum = momentum.max(-1.0).min(1.0);
+                *momentum = momentum.clamp(-1.0, 1.0);
             }
         }
     }

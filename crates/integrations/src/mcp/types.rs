@@ -197,7 +197,7 @@ impl From<McpPredictionResponse> for crate::types::PredictionResponse {
                     "down" => crate::types::PredictionDirection::Down,
                     _ => crate::types::PredictionDirection::Sideways,
                 },
-                price_target: resp.prediction.price_target.map(Decimal::from_f64_retain).flatten(),
+                price_target: resp.prediction.price_target.and_then(Decimal::from_f64_retain),
                 probability: resp.prediction.probability,
                 risk_score: resp.prediction.risk_score,
                 factors: resp.prediction.factors.into_iter().map(|f| {

@@ -179,12 +179,10 @@ impl OrderValidator {
             return Err(ValidationError::InvalidPrice);
         }
         
-        if self.config.enable_market_hours_validation {
-            if !self.config.supported_symbols.contains(&order.symbol) {
-                return Err(ValidationError::UnsupportedSymbol {
-                    symbol: order.symbol.clone(),
-                });
-            }
+        if self.config.enable_market_hours_validation && !self.config.supported_symbols.contains(&order.symbol) {
+            return Err(ValidationError::UnsupportedSymbol {
+                symbol: order.symbol.clone(),
+            });
         }
         
         Ok(())

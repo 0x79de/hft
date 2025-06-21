@@ -8,4 +8,4 @@ pub use state::*;
 pub use config::EngineConfig;
 pub use portfolio::Portfolio;
 
-pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
+pub type Result<T> = anyhow::Result<T>;

@@ -117,23 +117,23 @@ impl EventChannels {
     }
     
     #[inline]
-    pub fn send_event(&self, event: Event) -> Result<(), crossbeam_channel::SendError<Event>> {
+    pub fn send_event(&self, event: Event) -> anyhow::Result<()> {
         match &event {
-            Event::Order(_) => self.order_sender.send(event),
-            Event::Trade(_) => self.trade_sender.send(event),
-            Event::System(_) => self.system_sender.send(event),
+            Event::Order(_) => self.order_sender.send(event).map_err(anyhow::Error::from),
+            Event::Trade(_) => self.trade_sender.send(event).map_err(anyhow::Error::from),
+            Event::System(_) => self.system_sender.send(event).map_err(anyhow::Error::from),
         }
     }
     
     #[inline]
-    pub fn send_priority_event(&self, event: Event, sequence: u64) -> Result<(), crossbeam_channel::SendError<PriorityEvent>> {
+    pub fn send_priority_event(&self, event: Event, sequence: u64) -> anyhow::Result<()> {
         let priority = event.priority();
         let priority_event = PriorityEvent {
             event,
             priority,
             sequence,
         };
-        self.priority_sender.send(priority_event)
+        self.priority_sender.send(priority_event).map_err(anyhow::Error::from)
     }
 }
 

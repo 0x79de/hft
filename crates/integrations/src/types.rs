@@ -68,8 +68,9 @@ pub struct PredictionRequest {
     pub timestamp: DateTime<Utc>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub enum PredictionHorizon {
+    #[default]
     ShortTerm,  // < 1 minute
     MediumTerm, // 1-5 minutes
     LongTerm,   // > 5 minutes
@@ -150,11 +151,12 @@ pub struct IntegrationHealth {
     pub response_times: ResponseTimes,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub enum HealthStatus {
     Healthy,
     Degraded,
     Unhealthy,
+    #[default]
     Unknown,
 }
 
@@ -200,14 +202,3 @@ pub struct IntegrationMetrics {
     pub timestamp: DateTime<Utc>,
 }
 
-impl Default for PredictionHorizon {
-    fn default() -> Self {
-        PredictionHorizon::ShortTerm
-    }
-}
-
-impl Default for HealthStatus {
-    fn default() -> Self {
-        HealthStatus::Unknown
-    }
-}
