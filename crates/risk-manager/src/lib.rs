@@ -8,4 +8,4 @@ pub use limits::*;
 pub use position::Position;
 pub use validation::*;
 
-pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
+pub type Result<T> = anyhow::Result<T>;

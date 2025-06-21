@@ -1,32 +1,105 @@
-# HFT Integrations Configuration Example
-# Copy to integration-config.toml and fill in your actual credentials
+# HFT Trading System - Integration Configuration Example
+# 
+# Copy this file to integration-config.toml and fill in your actual credentials
+# 
+# Quick Setup:
+# 1. cp integration-config.example.toml integration-config.toml
+# 2. Edit integration-config.toml with your credentials
+# 3. Never commit integration-config.toml to git!
 
 [okx]
-api_key = "your_okx_api_key_here"
-secret_key = "your_okx_secret_key_here"  # Base64 encoded
-passphrase = "your_okx_passphrase_here"
-sandbox = true  # Set to false for production
-timeout_ms = 5000
-rate_limit_requests_per_second = 20
+# OKX Exchange API Configuration
+# Get these from: https://www.okx.com/account/my-api
+api_key = "12345678-1234-1234-1234-123456789abc"  # Example format
+secret_key = "AbCdEfGhIjKlMnOpQrStUvWxYz1234567890+/=="  # Base64 encoded secret
+passphrase = "MySecurePassphrase123!"  # Your chosen passphrase
+
+# Environment settings
+sandbox = true  # ⚠️ ALWAYS test with sandbox=true first!
+base_url = "https://www.okx.com"  # Main API endpoint
+timeout_ms = 5000  # 5 second timeout for API calls
+rate_limit_requests_per_second = 20  # Stay within OKX limits (20 req/sec)
+
+# Trading configuration
+[okx.trading]
+default_order_size = "0.001"  # Default BTC order size
+default_order_type = "limit"  # "limit" or "market"
+slippage_tolerance = 0.001  # 0.1% max slippage
+max_position_size = "1.0"  # Max position per symbol
+
+# Symbol-specific settings
+[okx.symbols.BTC-USDT]
+min_order_size = "0.00001"  # Minimum trade size
+max_order_size = "10.0"     # Maximum trade size
+tick_size = "0.1"           # Price increment
+risk_multiplier = 1.0       # Risk adjustment factor
+
+[okx.symbols.ETH-USDT]
+min_order_size = "0.001"
+max_order_size = "100.0"
+tick_size = "0.01"
+risk_multiplier = 1.2
 
 [mcp]
+# Model Context Protocol - AI Prediction Service
 server_url = "http://localhost:8000"
-api_key = "your_mcp_api_key_here"  # Optional
-timeout_ms = 1000
-max_retries = 3
-prediction_threshold = 0.7
+api_key = "mcp_api_key_optional"  # Optional authentication
+timeout_ms = 1000  # 1 second timeout for predictions
+max_retries = 3    # Retry failed requests 3 times
+prediction_threshold = 0.7  # Only act on 70%+ confidence predictions
 
 [rag]
+# Retrieval-Augmented Generation - Market Intelligence
 server_url = "http://localhost:8001"
-api_key = "your_rag_api_key_here"  # Optional
-timeout_ms = 500
-max_retries = 2
-query_threshold = 0.6
-top_k = 10
+api_key = "rag_api_key_optional"  # Optional authentication
+timeout_ms = 500   # 500ms timeout for searches
+max_retries = 2    # Retry failed requests 2 times
+query_threshold = 0.6  # 60% relevance threshold
+top_k = 10  # Return top 10 search results
 
 [coordinator]
-signal_processing_interval_ms = 100
-health_check_interval_ms = 5000
-max_concurrent_requests = 100
-decision_timeout_ms = 50
-consensus_threshold = 0.7
+# Integration Coordinator Settings
+signal_processing_interval_ms = 100  # Process signals every 100ms
+health_check_interval_ms = 5000      # Health check every 5 seconds
+max_concurrent_requests = 100        # Max parallel API calls
+decision_timeout_ms = 50             # Max 50ms for trading decisions
+consensus_threshold = 0.7            # 70% agreement for multi-source signals
+
+# Risk Management Settings
+[risk]
+enable_position_limits = true
+enable_daily_loss_limits = true
+enable_drawdown_protection = true
+max_daily_trades = 1000  # Maximum trades per day
+emergency_stop_loss_pct = 5.0  # Emergency stop at 5% portfolio loss
+
+# Monitoring and Logging
+[monitoring]
+log_level = "info"  # debug, info, warn, error
+enable_metrics_export = true
+metrics_port = 9090
+enable_performance_logging = true
+log_all_trades = true
+log_market_data = false  # ⚠️ Very verbose, enable only for debugging
+
+# Optional: Webhook Notifications
+[notifications]
+enable_webhooks = false
+webhook_url = "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+webhook_secret = "your_webhook_secret_here"
+notify_on_trades = true
+notify_on_errors = true
+notify_on_health_issues = true
+
+# Example Production Settings (Advanced Users)
+# [okx]
+# sandbox = false  # ⚠️ LIVE TRADING - BE CAREFUL!
+# rate_limit_requests_per_second = 50  # Higher rate limit for production
+# 
+# [okx.trading]
+# default_order_size = "0.01"  # Larger default size for production
+# slippage_tolerance = 0.0005  # Tighter slippage for better execution
+# 
+# [risk]
+# max_daily_trades = 10000  # Higher trade limit for production
+# emergency_stop_loss_pct = 2.0  # Tighter emergency stop

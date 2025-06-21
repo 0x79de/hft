@@ -28,7 +28,7 @@ impl Default for ProcessorConfig {
             worker_threads: num_cpus::get(),
             buffer_size: 10000,
             flush_interval: Duration::from_millis(5),
-            enable_priority_queue: true,
+            enable_priority_queue: false,  // Disable priority queue for now
         }
     }
 }
@@ -160,7 +160,13 @@ impl EventProcessor {
             
             while *running.read() {
                 let event = if enable_priority {
-                    priority_queue.pop()
+                    if let Some(event) = priority_queue.pop() {
+                        Some(event)
+                    } else {
+                        // If priority queue is empty, wait a bit to avoid busy loop
+                        tokio::time::sleep(Duration::from_millis(1)).await;
+                        None
+                    }
                 } else {
                     select! {
                         recv(channels.order_receiver()) -> result => result.ok(),
@@ -245,9 +251,9 @@ impl Drop for EventProcessor {
             
             // In production, try to spawn a task to stop gracefully
             let running = self.running.clone();
-            let _ = rt.spawn(async move {
+            std::mem::drop(rt.spawn(async move {
                 *running.write() = false;
-            });
+            }));
         } else {
             // If no runtime is available, just set the flag
             *self.running.write() = false;

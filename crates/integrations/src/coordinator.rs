@@ -401,7 +401,7 @@ impl IntegrationCoordinator {
             symbol: context.symbol,
             signal_type,
             strength: signal_strength.abs(),
-            confidence: signal_confidence.max(0.0).min(1.0),
+            confidence: signal_confidence.clamp(0.0, 1.0),
             price_target: context.prediction.as_ref()
                 .and_then(|p| p.prediction.price_target),
             stop_loss: context.prediction.as_ref()
@@ -462,7 +462,7 @@ impl IntegrationCoordinator {
             }
         }
         
-        score.max(-1.0).min(1.0)
+        score.clamp(-1.0, 1.0)
     }
     
     async fn assess_risk(&self, context: &MarketContext) -> RiskAssessment {

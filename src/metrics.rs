@@ -10,6 +10,12 @@ pub struct SystemMetrics {
     latency_measurements: AtomicU64,
 }
 
+impl Default for SystemMetrics {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SystemMetrics {
     pub fn new() -> Self {
         Self {

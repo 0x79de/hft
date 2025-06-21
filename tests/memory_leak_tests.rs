@@ -289,7 +289,7 @@ fn test_resource_cleanup_on_drop() {
     }
     
     // If we reach here without issues, cleanup was successful
-    assert!(true, "Resource cleanup completed successfully");
+    println!("Resource cleanup completed successfully");
 }
 
 #[cfg(target_os = "linux")]

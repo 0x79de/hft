@@ -54,11 +54,7 @@ impl OkxWebSocket {
     }
     
     pub async fn connect(&self) -> Result<()> {
-        let ws_url = if self.config.sandbox {
-            "wss://ws.okx.com:8443/ws/v5/public"
-        } else {
-            "wss://ws.okx.com:8443/ws/v5/public"
-        };
+        let ws_url = "wss://ws.okx.com:8443/ws/v5/public";
         
         let url = Url::parse(ws_url)?;
         info!("Connecting to OKX WebSocket: {}", url);

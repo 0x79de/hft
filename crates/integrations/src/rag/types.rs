@@ -62,8 +62,9 @@ pub struct PatternSearchQuery {
     pub timestamp: DateTime<Utc>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub enum PatternType {
+    #[default]
     PricePattern,
     VolumePattern,
     TechnicalIndicatorPattern,
@@ -74,11 +75,12 @@ pub enum PatternType {
     BreakoutPattern,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub enum TimeFrame {
     #[serde(rename = "1m")]
     OneMinute,
     #[serde(rename = "5m")]
+    #[default]
     FiveMinutes,
     #[serde(rename = "15m")]
     FifteenMinutes,
@@ -220,18 +222,20 @@ pub struct MarketRegime {
     pub trend_direction: TrendDirection,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub enum VolatilityLevel {
     Low,
+    #[default]
     Medium,
     High,
     Extreme,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub enum TrendDirection {
     Bullish,
     Bearish,
+    #[default]
     Sideways,
 }
 
@@ -317,29 +321,5 @@ impl From<crate::types::MarketContext> for MarketEvent {
             }),
             metadata: HashMap::new(),
         }
-    }
-}
-
-impl Default for TimeFrame {
-    fn default() -> Self {
-        TimeFrame::FiveMinutes
-    }
-}
-
-impl Default for PatternType {
-    fn default() -> Self {
-        PatternType::PricePattern
-    }
-}
-
-impl Default for VolatilityLevel {
-    fn default() -> Self {
-        VolatilityLevel::Medium
-    }
-}
-
-impl Default for TrendDirection {
-    fn default() -> Self {
-        TrendDirection::Sideways
     }
 }

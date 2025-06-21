@@ -16,7 +16,8 @@ members = [
     "crates/trading-engine",
     "crates/risk-manager",
     "crates/market-data",
-    "crates/benchmarks"
+    "crates/benchmarks",
+    "crates/integrations"
 ]
 
 [dependencies]
@@ -27,6 +28,7 @@ trading-engine = { path = "crates/trading-engine" }
 risk-manager = { path = "crates/risk-manager" }
 market-data = { path = "crates/market-data" }
 latency-profiler = { path = "crates/latency-profiler" }
+integrations = { path = "crates/integrations", optional = true }
 
 # Async runtime
 tokio = { version = "1.35", features = ["full", "rt-multi-thread", "macros"] }
@@ -51,6 +53,7 @@ num-traits = "0.2"
 num-derive = "0.4"
 fixed = "1.24"
 wide = "0.7"
+rust_decimal = { version = "1.32", features = ["serde-float"] }
 
 # Time and date handling
 chrono = { version = "0.4", features = ["serde"] }
@@ -79,6 +82,10 @@ toml = "0.8"
 
 # Testing
 criterion = { version = "0.5", features = ["html_reports"] }
+
+[features]
+default = []
+integrations = ["dep:integrations"]
 
 [dev-dependencies]
 proptest = "1.4"
