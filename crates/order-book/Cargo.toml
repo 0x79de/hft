@@ -9,6 +9,7 @@ description = "Lock-free order book implementation for HFT trading"
 serde = { workspace = true }
 crossbeam = { workspace = true }
 crossbeam-skiplist = "0.1"
+crossbeam-queue = "0.3"
 dashmap = "5.5"
 parking_lot = "0.12"
 fixed = { version = "1.24", features = ["serde"] }
@@ -19,6 +20,8 @@ tracing = { workspace = true }
 anyhow = { workspace = true }
 thiserror = "1.0"
 num-traits = "0.2"
+arrayvec = "0.7"
+lazy_static = "1.4"
 
 [dev-dependencies]
 serde_json = "1.0"
