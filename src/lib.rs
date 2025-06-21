@@ -11,6 +11,7 @@ pub mod config;
 pub mod metrics;
 pub mod types;
 pub mod utils;
+pub mod numa;
 
 pub use order_book;
 pub use event_processor;
